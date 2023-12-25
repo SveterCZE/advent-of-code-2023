@@ -37,8 +37,8 @@ def part2(instructions):
 
 def find_all_journeys_in_graph(start_coord, finish_coord, graph, finished_journeys_DB):
     journey_length = 0
-    visited_nodes = set()
-    visited_nodes.add(start_coord)
+    visited_nodes = []
+    visited_nodes.append(start_coord)
     find_all_journeys_in_graph_recursive_helper(start_coord, finish_coord, graph, finished_journeys_DB, visited_nodes, journey_length)
 
 def find_all_journeys_in_graph_recursive_helper(current_coord, finish_coord, graph, finished_journeys_DB, visited_nodes, journey_length):
@@ -50,9 +50,9 @@ def find_all_journeys_in_graph_recursive_helper(current_coord, finish_coord, gra
     else:
         for next_node, distance in graph[current_coord].items():
             if next_node not in visited_nodes:
-                updated_journey = copy.deepcopy(visited_nodes)
-                updated_journey.add(next_node)
-                find_all_journeys_in_graph_recursive_helper(next_node, finish_coord, graph, finished_journeys_DB, updated_journey, journey_length + distance)
+                visited_nodes.append(next_node)
+                find_all_journeys_in_graph_recursive_helper(next_node, finish_coord, graph, finished_journeys_DB, visited_nodes, journey_length + distance)
+                visited_nodes.pop()
 
 
 def build_graph(instructions, intersections):
