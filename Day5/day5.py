@@ -98,8 +98,6 @@ def run_recursive_almanac(initial_ranges_DB, almanac):
                 processed_ranges.add(result)
             if failures != None:
                 for elem in failures:
-                    if elem[0] > elem[1]:
-                        print("CHYBA   ", elem)
                     buffered_ranges.add(elem)
         unprocessed_ranges = buffered_ranges
         buffered_ranges = set()
@@ -112,43 +110,29 @@ def run_range_slicing(almanac_line, checked_range):
     # ALTERNATIVE 1 --- Whole checked range is within the almanac line
     if checked_range[0] >= almanac_range[0] and checked_range[0] <= almanac_range[1] and checked_range[1] >= almanac_range[0] and checked_range[1] <= almanac_range[1]:
         modified_line = run_almanac_on_range(almanac_line, checked_range)
-        # print("1")
         return modified_line, None
     # ALTERNATIVE 2 --- Whole checked range is left of the almanac line
     elif checked_range[1] < almanac_range[0]:
-        # print("2")
         return None, [checked_range]
     # ALTERNATIVE 3 --- Whole checked range is right of the almanac line
     elif checked_range[0] > almanac_range[1]:
-        # print("3")
         return None, [checked_range]
     # ALTERNATIVE 4 --- Whole almanac line is within the checked range  AND THE CHECKED RANGE EXTENDS
     elif almanac_range[0] > checked_range[0] and almanac_range[0] < checked_range[1] and almanac_range[1] > checked_range[0] and almanac_range[1] < checked_range[1]:
         modified_line = run_almanac_on_range(almanac_line, almanac_range)
         left_side = (checked_range[0], almanac_range[0] - 1)
         right_side = (almanac_range[1] + 1, checked_range[1])
-        # print("4")
         return modified_line, [left_side, right_side]
     # ALTERNATIVE 5 --- Checked range extends on the right side
     elif checked_range[0] >= almanac_range[0] and checked_range[0] <= almanac_range[1] and checked_range[1] > almanac_range[1]:
         modified_line = run_almanac_on_range(almanac_line, (checked_range[0], almanac_range[1]))
-        # print("5")
         return modified_line, [(almanac_range[1] + 1, checked_range[1])]
     # ALTERNATIVE 6 --- Checked range extends on the left side
     elif checked_range[0] < almanac_range[0] and checked_range[1] >= almanac_range[0] and checked_range[1] <= checked_range[1]:
         modified_line = run_almanac_on_range(almanac_line, (almanac_range[0], checked_range[1]))
-        # print("6")
         return modified_line, [(checked_range[0], almanac_range[0] - 1)]
-    # ALTERNATIVE 7 --- Error, you should not get here
-    else:
-        print("Error. You should not be here.")
 
 def run_almanac_on_range(almanac_line, checked_range):
-    # print(almanac_line, checked_range)
-    result = (almanac_line[0] + (checked_range[0] - almanac_line[1]), almanac_line[0] + (checked_range[1] - almanac_line[1]))
-    if result[0] > result[1]:
-        print("POZOR   ", result)
-    return result
-
+    return (almanac_line[0] + (checked_range[0] - almanac_line[1]), almanac_line[0] + (checked_range[1] - almanac_line[1]))
 
 main()
