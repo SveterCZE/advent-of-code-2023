@@ -13,7 +13,7 @@ def get_input():
     light_to_temperature = []
     temperature_to_humidity = []
     humidity_to_location = []
-    f = open("sample.txt", "r")
+    f = open("input.txt", "r")
     relevant_db = None
     for line in f:
         if line.startswith("seeds"):
@@ -63,15 +63,23 @@ def part2(seeds, seed_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to
     ranges_db = set()
     for i in range(0, len(seeds), 2):
         ranges_db.add((seeds[i], seeds[i] + seeds[i + 1] - 1))
+    # ranges_db = [(82,82)]
+    final_ranges = set()
     for checked_range in ranges_db:
-        ranges_db = run_recursive_almanac(ranges_db, seed_to_soil)
-        # ranges_db = run_recursive_almanac(ranges_db, soil_to_fertilizer)
-        # ranges_db = run_recursive_almanac(ranges_db, fertilizer_to_water)
-        # ranges_db = run_recursive_almanac(ranges_db, water_to_light)
-        # ranges_db = run_recursive_almanac(ranges_db, light_to_temperature)
-        # ranges_db = run_recursive_almanac(ranges_db, temperature_to_humidity)
-        # ranges_db = run_recursive_almanac(ranges_db, humidity_to_location)
-    return ranges_db
+        modfied_ranges = set()
+        modfied_ranges.add(checked_range)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, seed_to_soil)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, soil_to_fertilizer)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, fertilizer_to_water)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, water_to_light)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, light_to_temperature)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, temperature_to_humidity)
+        modfied_ranges = run_recursive_almanac(modfied_ranges, humidity_to_location)
+        for elem in modfied_ranges:
+            final_ranges.add(elem)
+    list_of_results = [x[0] for x in final_ranges]
+    list_of_results.sort()
+    return list_of_results[0]
 
 def run_almanac(item, almanac):
     for almanac_line in almanac:
@@ -81,7 +89,7 @@ def run_almanac(item, almanac):
 
 def run_recursive_almanac(initial_ranges_DB, almanac):
     processed_ranges = set()
-    unprocessed_ranges = set()
+    unprocessed_ranges = initial_ranges_DB
     buffered_ranges = set()
     for almanac_line in almanac:
         for checked_range in unprocessed_ranges:
@@ -90,43 +98,57 @@ def run_recursive_almanac(initial_ranges_DB, almanac):
                 processed_ranges.add(result)
             if failures != None:
                 for elem in failures:
+                    if elem[0] > elem[1]:
+                        print("CHYBA   ", elem)
                     buffered_ranges.add(elem)
         unprocessed_ranges = buffered_ranges
         buffered_ranges = set()
     for elem in unprocessed_ranges:
         processed_ranges.add(elem)
+    return processed_ranges
              
 def run_range_slicing(almanac_line, checked_range):
     almanac_range = (almanac_line[1], almanac_line[1] + almanac_line[2] - 1)
     # ALTERNATIVE 1 --- Whole checked range is within the almanac line
     if checked_range[0] >= almanac_range[0] and checked_range[0] <= almanac_range[1] and checked_range[1] >= almanac_range[0] and checked_range[1] <= almanac_range[1]:
         modified_line = run_almanac_on_range(almanac_line, checked_range)
+        # print("1")
         return modified_line, None
     # ALTERNATIVE 2 --- Whole checked range is left of the almanac line
     elif checked_range[1] < almanac_range[0]:
-        return None, checked_range
+        # print("2")
+        return None, [checked_range]
     # ALTERNATIVE 3 --- Whole checked range is right of the almanac line
     elif checked_range[0] > almanac_range[1]:
-        return None, checked_range
-    # ALTERNATIVE 4 --- Whole almanac line is within the checked range
-    elif almanac_range[0] >= checked_range[0] and almanac_range[0] <= checked_range[1] and almanac_range[1] >= checked_range[0] and almanac_range[1] <= checked_range[1]:
+        # print("3")
+        return None, [checked_range]
+    # ALTERNATIVE 4 --- Whole almanac line is within the checked range  AND THE CHECKED RANGE EXTENDS
+    elif almanac_range[0] > checked_range[0] and almanac_range[0] < checked_range[1] and almanac_range[1] > checked_range[0] and almanac_range[1] < checked_range[1]:
         modified_line = run_almanac_on_range(almanac_line, almanac_range)
         left_side = (checked_range[0], almanac_range[0] - 1)
         right_side = (almanac_range[1] + 1, checked_range[1])
+        # print("4")
         return modified_line, [left_side, right_side]
     # ALTERNATIVE 5 --- Checked range extends on the right side
     elif checked_range[0] >= almanac_range[0] and checked_range[0] <= almanac_range[1] and checked_range[1] > almanac_range[1]:
         modified_line = run_almanac_on_range(almanac_line, (checked_range[0], almanac_range[1]))
+        # print("5")
         return modified_line, [(almanac_range[1] + 1, checked_range[1])]
     # ALTERNATIVE 6 --- Checked range extends on the left side
     elif checked_range[0] < almanac_range[0] and checked_range[1] >= almanac_range[0] and checked_range[1] <= checked_range[1]:
         modified_line = run_almanac_on_range(almanac_line, (almanac_range[0], checked_range[1]))
-        return modified_line, [(checked_range[0], almanac_line[0] - 1)]
+        # print("6")
+        return modified_line, [(checked_range[0], almanac_range[0] - 1)]
     # ALTERNATIVE 7 --- Error, you should not get here
     else:
         print("Error. You should not be here.")
 
-
+def run_almanac_on_range(almanac_line, checked_range):
+    # print(almanac_line, checked_range)
+    result = (almanac_line[0] + (checked_range[0] - almanac_line[1]), almanac_line[0] + (checked_range[1] - almanac_line[1]))
+    if result[0] > result[1]:
+        print("POZOR   ", result)
+    return result
 
 
 main()
