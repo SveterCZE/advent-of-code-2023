@@ -63,7 +63,6 @@ def part2(seeds, seed_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to
     ranges_db = set()
     for i in range(0, len(seeds), 2):
         ranges_db.add((seeds[i], seeds[i] + seeds[i + 1] - 1))
-    # ranges_db = [(82,82)]
     final_ranges = set()
     for checked_range in ranges_db:
         modfied_ranges = set()
