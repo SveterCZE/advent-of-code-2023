@@ -1,4 +1,3 @@
-from itertools import product
 import re
 
 def get_input():
@@ -137,4 +136,4 @@ if __name__ == "__main__":
     
     instructions = get_input()
     formatted_instructions = create_formatted_instructions(instructions, True)
-    print(part1(formatted_instructions)) 
+    print(part1(formatted_instructions))
