@@ -57,8 +57,6 @@ def part2(instructions):
     return sum
 
 def find_smudges(pattern):
-    total = 0
-    # initial_reflection = check_pattern_for_reflections(pattern)
     row_db, column_db = create_pattern_dbs(pattern)
     original_row_value = find_reflection(row_db, 100)
     original_column_value = find_reflection(column_db, 1)
@@ -71,8 +69,6 @@ def find_smudges(pattern):
                 updated_pattern[i][j] = "."
             else:
                 updated_pattern[i][j] = "#"
-            # updated_reflections = check_pattern_for_reflections(updated_pattern)
-            # sum += sum(updated_reflections - initial_reflection)
             row_db_updated, column_db_updated = create_pattern_dbs(updated_pattern)
             reflection_value_row = find_reflection(row_db_updated, 100)
             for elem in reflection_value_row:
@@ -80,15 +76,6 @@ def find_smudges(pattern):
             reflection_value_column = find_reflection(column_db_updated, 1)
             for elem in reflection_value_column:
                 new_column_reflections_found.add(elem)
-            # if reflection_value_row != original_row_value and reflection_value_row not in new_reflections_found:
-            #     sum += reflection_value_row
-            #     new_reflections_found.add(reflection_value_row)
-
-            # if reflection_value_column != original_column_value and reflection_value_column not in new_reflections_found:
-            #     sum += reflection_value_column
-            #     new_reflections_found.add(reflection_value_column)
-    # if sum == 0:
-    #     print(pattern)
     return sum(new_row_reflections_found - original_row_value) + sum(new_column_reflections_found - original_column_value)
 
 if __name__ == "__main__":
