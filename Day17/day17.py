@@ -19,6 +19,7 @@ def part1(instructions):
 
 def run_steps_calculation(instructions, visited_coordinates, steps_queue, p2=False):
     while True:
+        print(steps_queue.qsize(), len(visited_coordinates))
         current_coordinate = steps_queue.get()
         if (current_coordinate[1], current_coordinate[2], current_coordinate[3]) in visited_coordinates:
             pass
